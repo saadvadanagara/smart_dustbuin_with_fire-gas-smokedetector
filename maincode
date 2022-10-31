@@ -1,0 +1,87 @@
+#include<Servo.h>
+int trigPin1 = 6;
+int echoPin1 = 7;
+int ledPin1= 3;
+int ledPin2=4;
+int trigPin2 = 8;
+int echoPin2 = 9;
+int smokeA0 = A5;
+Servo Myservo;
+int pos;
+int sensorThres = 400;
+
+
+void setup() {
+  Serial.begin (9600);
+  pinMode(trigPin1, OUTPUT);
+  pinMode(echoPin1, INPUT);
+ 
+  pinMode(trigPin2, OUTPUT);
+  pinMode(echoPin2, INPUT);
+
+  pinMode(ledPin1, OUTPUT);
+  pinMode(ledPin2, OUTPUT);
+
+ Myservo.attach(2);
+ pinMode(smokeA0, INPUT);
+  Serial.begin(9600);
+}
+
+void firstsensor(){ // This function is for first sensor.
+  int duration1, distance1;
+  digitalWrite (trigPin1, HIGH);
+  delayMicroseconds (10);
+  digitalWrite (trigPin1, LOW);
+  duration1 = pulseIn (echoPin1, HIGH);
+  distance1 = (duration1/2) / 29.1;
+
+     
+
+  if (distance1 < 30) {  // Change the number for long or short distances.
+          pos=90;
+          Myservo.write(pos);
+          delay(1000);
+  } 
+  if(distance1>30) {
+          pos=-90;
+          Myservo.write(pos);
+          delay(1000);
+  }
+}
+void secondsensor(){ // This function is for second sensor.
+    int duration2, distance2;
+    digitalWrite (trigPin2, HIGH);
+    delayMicroseconds (10);
+    digitalWrite (trigPin2, LOW);
+    duration2 = pulseIn (echoPin2, HIGH);
+    distance2 = (duration2/2) / 29.1;
+  
+    if (distance2 < 20) {  // Change the number for long or short distances.
+      digitalWrite (ledPin2, HIGH);
+    }
+ else {
+      digitalWrite (ledPin2, LOW);
+    }   
+}
+void thirdsensor(){
+   int analogSensor = analogRead(smokeA0);
+   if (analogSensor > sensorThres)
+    {
+      tone(ledPin1, 1000, 200);
+    }
+    else
+    {
+     noTone(ledPin1);
+     
+    }
+  
+}
+ 
+
+void loop() {
+Serial.println("\n");
+firstsensor();
+secondsensor();
+thirdsensor();
+delay(100);
+}
